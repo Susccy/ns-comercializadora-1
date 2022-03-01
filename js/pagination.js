@@ -183,16 +183,19 @@ function createFilterCheckbox(type, name, checked = false) {
   return listItem
 }
 
-const preselectFilter = new URLSearchParams(window.location.search).get(
-  "filter"
-)
+const preselectFilter = new URLSearchParams(window.location.search)
+  .get("filter")
+  .toLowerCase()
+let preselectFilterIsValid = false
 
 for (const categoryName of [...categoryNames].sort()) {
+  preselectFilterIsValid =
+    preselectFilterIsValid || preselectFilter === categoryName.toLowerCase()
   categoryList.appendChild(
     createFilterCheckbox(
       "categories",
       categoryName,
-      preselectFilter === categoryName
+      preselectFilter === categoryName.toLowerCase()
     )
   )
 }
@@ -207,4 +210,4 @@ for (const brandName of [...brandNames].sort()) {
   brandList.appendChild(createFilterCheckbox("brands", brandName))
 }
 
-paginate()
+preselectFilterIsValid || paginate()
