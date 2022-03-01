@@ -1,9 +1,10 @@
 const PRODUCTS_PER_PAGE = 15
 
 const productContainer = document.getElementById("product-container")
-const productStore = {...productContainer.children}
+const productStore = [...productContainer.children]
 const paginationList = document.getElementById("pagination-list")
 const categoryList = document.getElementById("category-list")
+const subcategoryList = document.getElementById("subcategory-list")
 const brandList = document.getElementById("brand-list")
 
 function paginate() {
@@ -71,26 +72,32 @@ function paginate() {
 }
 
 const categoryNames = new Set()
+const subcategoryNames = new Set()
 const brandNames = new Set()
 const activeFilters = {
   categories: [],
+  subcategories: [],
   brands: [],
 }
 
 for (const {
-  dataset: {categories, brands},
-} of productContainer.children) {
+  dataset: { categories, subcategories, brands },
+} of productStore) {
   categories
     ?.split(/ /)
     .filter((cn) => cn)
     .map(categoryNames.add, categoryNames)
+  subcategories
+    ?.split(/ /)
+    .filter((sn) => sn)
+    .map(subcategoryNames.add, subcategoryNames)
   brands
     ?.split(/ /)
     .filter((bn) => bn)
     .map(brandNames.add, brandNames)
 }
 
-function filter({target}) {
+function filter({ target }) {
   const [filterType, filterValue] = target.name.split(/-/)
 
   target.checked
@@ -102,26 +109,42 @@ function filter({target}) {
 
   productContainer.innerHTML = ""
 
-  if (!activeFilters.categories.length && !activeFilters.brands.length)
-    for (const product of Object.values(productStore))
-      productContainer.appendChild(product)
+  if (
+    !activeFilters.categories.length &&
+    !activeFilters.subcategories.length &&
+    !activeFilters.brands.length
+  )
+    for (const product of productStore) productContainer.appendChild(product)
   else {
-    const matchingProducts = Object.values(productStore).filter(
-      ({dataset}) =>
-        dataset.categories
-          ?.split(/ /)
-          .some(
-            (category) =>
-              !activeFilters.categories.length ||
-              activeFilters.categories.includes(category)
-          ) &&
-        dataset.brands
-          ?.split(/ /)
-          .some(
-            (brand) =>
-              !activeFilters.brands.length ||
-              activeFilters.brands.includes(brand)
-          )
+    const matchingProducts = productStore.filter(
+      ({ dataset }) =>
+        Object.keys(dataset).some((dataName) =>
+          ["categories", "subcategories", "brands"].includes(dataName)
+        ) &&
+        (typeof dataset.categories === "undefined" ||
+          dataset.categories
+            .split(/ /)
+            .some(
+              (category) =>
+                !activeFilters.categories.length ||
+                activeFilters.categories.includes(category)
+            )) &&
+        (typeof dataset.subcategories === "undefined" ||
+          dataset.subcategories
+            ?.split(/ /)
+            .some(
+              (subcategory) =>
+                !activeFilters.subcategories.length ||
+                activeFilters.subcategories.includes(subcategory)
+            )) &&
+        (typeof dataset.brands === "undefined" ||
+          dataset.brands
+            ?.split(/ /)
+            .some(
+              (brand) =>
+                !activeFilters.brands.length ||
+                activeFilters.brands.includes(brand)
+            ))
     )
     for (const matchingProduct of matchingProducts) {
       productContainer.appendChild(matchingProduct)
@@ -130,14 +153,15 @@ function filter({target}) {
   paginate()
 }
 
-function createFilterCheckbox(type, name) {
+function createFilterCheckbox(type, name, checked = false) {
   const listItem = document.createElement("li")
   listItem.dataset[type] = name
   const input = document.createElement("input")
   input.setAttribute("type", "checkbox")
   input.setAttribute("name", `${type}-${name}`)
   input.setAttribute("id", input.name)
-  input.addEventListener("click", filter)
+  input.addEventListener("change", filter)
+  checked && input.click()
   const label = document.createElement("label")
   label.setAttribute("for", input.name)
   const span = document.createElement("span")
@@ -146,7 +170,7 @@ function createFilterCheckbox(type, name) {
   small.appendChild(
     document.createTextNode(
       `(${
-        Array.from(productContainer.children).filter(({dataset}) =>
+        productStore.filter(({ dataset }) =>
           dataset[type]?.split(/ /).includes(name)
         ).length
       })`
@@ -159,8 +183,24 @@ function createFilterCheckbox(type, name) {
   return listItem
 }
 
+const preselectFilter = new URLSearchParams(window.location.search).get(
+  "filter"
+)
+
 for (const categoryName of [...categoryNames].sort()) {
-  categoryList.appendChild(createFilterCheckbox("categories", categoryName))
+  categoryList.appendChild(
+    createFilterCheckbox(
+      "categories",
+      categoryName,
+      preselectFilter === categoryName
+    )
+  )
+}
+
+for (const subcategoryName of [...subcategoryNames].sort()) {
+  subcategoryList.appendChild(
+    createFilterCheckbox("subcategories", subcategoryName)
+  )
 }
 
 for (const brandName of [...brandNames].sort()) {
