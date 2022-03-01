@@ -131,7 +131,7 @@ function filter({ target }) {
             )) &&
         (typeof dataset.subcategories === "undefined" ||
           dataset.subcategories
-            ?.split(/ /)
+            .split(/ /)
             .some(
               (subcategory) =>
                 !activeFilters.subcategories.length ||
@@ -139,7 +139,7 @@ function filter({ target }) {
             )) &&
         (typeof dataset.brands === "undefined" ||
           dataset.brands
-            ?.split(/ /)
+            .split(/ /)
             .some(
               (brand) =>
                 !activeFilters.brands.length ||
