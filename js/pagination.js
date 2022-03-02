@@ -106,15 +106,18 @@ for (const {
   dataset: { categories, subcategories, brands },
 } of productStore) {
   categories
-    ?.split(/ /)
+    ?.split(/,/)
+    .map((cn) => cn.trim())
     .filter((cn) => cn)
     .map(categoryNames.add, categoryNames)
   subcategories
-    ?.split(/ /)
+    ?.split(/,/)
+    .map((sn) => sn.trim())
     .filter((sn) => sn)
     .map(subcategoryNames.add, subcategoryNames)
   brands
-    ?.split(/ /)
+    ?.split(/,/)
+    .map((bn) => bn.trim())
     .filter((bn) => bn)
     .map(brandNames.add, brandNames)
 }
@@ -157,21 +160,24 @@ function filter({ target }) {
         (!activeFilters.categories.length ||
           (!(typeof dataset.categories === "undefined") &&
             dataset.categories
-              .split(/ /)
+              .split(/,/)
+              .map((cn) => cn.trim())
               .some((category) =>
                 activeFilters.categories.includes(category)
               ))) &&
         (!activeFilters.subcategories.length ||
           (!(typeof dataset.subcategories === "undefined") &&
             dataset.subcategories
-              .split(/ /)
+              .split(/,/)
+              .map((sn) => sn.trim())
               .some((subcategory) =>
                 activeFilters.subcategories.includes(subcategory)
               ))) &&
         (!activeFilters.brands.length ||
           (!(typeof dataset.brands === "undefined") &&
             dataset.brands
-              .split(/ /)
+              .split(/,/)
+              .map((bn) => bn.trim())
               .some((brand) => activeFilters.brands.includes(brand))))
     )
     for (const matchingProduct of matchingProducts) {
@@ -199,7 +205,10 @@ function createFilterCheckbox(type, name, checked = false) {
     document.createTextNode(
       `(${
         productStore.filter(({ dataset }) =>
-          dataset[type]?.split(/ /).includes(name)
+          dataset[type]
+            ?.split(/,/)
+            .map((name) => name.trim())
+            .includes(name)
         ).length
       })`
     )
