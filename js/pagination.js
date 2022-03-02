@@ -154,33 +154,25 @@ function filter({ target }) {
   else {
     const matchingProducts = productStore.filter(
       ({ dataset }) =>
-        Object.keys(dataset).some((dataName) =>
-          ["categories", "subcategories", "brands"].includes(dataName)
-        ) &&
-        (typeof dataset.categories === "undefined" ||
-          dataset.categories
-            .split(/ /)
-            .some(
-              (category) =>
-                !activeFilters.categories.length ||
+        (!activeFilters.categories.length ||
+          (!(typeof dataset.categories === "undefined") &&
+            dataset.categories
+              .split(/ /)
+              .some((category) =>
                 activeFilters.categories.includes(category)
-            )) &&
-        (typeof dataset.subcategories === "undefined" ||
-          dataset.subcategories
-            .split(/ /)
-            .some(
-              (subcategory) =>
-                !activeFilters.subcategories.length ||
+              ))) &&
+        (!activeFilters.subcategories.length ||
+          (!(typeof dataset.subcategories === "undefined") &&
+            dataset.subcategories
+              .split(/ /)
+              .some((subcategory) =>
                 activeFilters.subcategories.includes(subcategory)
-            )) &&
-        (typeof dataset.brands === "undefined" ||
-          dataset.brands
-            .split(/ /)
-            .some(
-              (brand) =>
-                !activeFilters.brands.length ||
-                activeFilters.brands.includes(brand)
-            ))
+              ))) &&
+        (!activeFilters.brands.length ||
+          (!(typeof dataset.brands === "undefined") &&
+            dataset.brands
+              .split(/ /)
+              .some((brand) => activeFilters.brands.includes(brand))))
     )
     for (const matchingProduct of matchingProducts) {
       productContainer.appendChild(matchingProduct)
