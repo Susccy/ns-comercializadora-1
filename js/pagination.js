@@ -185,7 +185,7 @@ function createFilterCheckbox(type, name, checked = false) {
 
 const preselectFilter = new URLSearchParams(window.location.search)
   .get("filter")
-  .toLowerCase()
+  ?.toLowerCase()
 let preselectFilterIsValid = false
 
 for (const categoryName of [...categoryNames].sort()) {
