@@ -194,7 +194,7 @@ function createFilterCheckbox(type, name, checked = false) {
   input.setAttribute("type", "checkbox")
   input.setAttribute("name", `${type}-${name}`)
   input.setAttribute("id", input.name)
-  input.addEventListener("change", filter)
+  input.addEventListener("click", filter)
   checked && input.click()
   const label = document.createElement("label")
   label.setAttribute("for", input.name)
